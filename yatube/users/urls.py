@@ -7,7 +7,7 @@ from . import views
 
 app_name = 'users'
 
-urlpatterns = {
+urlpatterns = [
     path('signup/', views.SignUp.as_view(), name='signup'),
     path(
         'logout/', LogoutView.as_view(template_name='users/logged_out.html'),
@@ -53,4 +53,4 @@ urlpatterns = {
         (template_name='users/password_reset_complete.html'),
         name='password_reset_complete'
     ),
-}
+]
