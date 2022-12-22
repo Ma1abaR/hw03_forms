@@ -23,7 +23,6 @@ def index(request):
 def group_posts(request, slug):
     template = 'posts/group_list.html'
     group = get_object_or_404(Group, slug=slug)
-    posts = group.posts.all()
     paginator = Paginator(
         group.posts.select_related('author').order_by('-pub_date'),
         AMOUNT_POST)
@@ -32,7 +31,6 @@ def group_posts(request, slug):
     context = {
         'page_obj': page_obj,
         'group': group,
-        'posts': posts,
     }
     return render(request, template, context)
 
@@ -63,30 +61,32 @@ def post_detail(request, post_id):
 @login_required
 def post_create(request):
     template = 'posts/create_post.html'
+    form = PostForm(request.POST or None)
     if request.method == "POST":
-        form = PostForm(request.POST or None)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
             post.save()
             return redirect('post:profile', post.author)
         return render(request, template, {'form': form})
-    form = PostForm()
     return render(request, 'posts/create_post.html', {'form': form})
 
 
 @login_required
 def post_edit(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
-    form = PostForm(request.POST or None, instance=post)
-    is_edit = True
+    form = PostForm(
+        request.POST or None,
+        instance=post
+    )
     if post.author != request.user:
-        return redirect('posts:post_detail', post_id)
-    if not form.is_valid():
-        return render(
-            request,
-            'posts/create_post.html',
-            {'form': form, 'post_id': post_id, 'is_edit': is_edit}
-        )
-    form.save()
-    return redirect('posts:post_detail', post_id)
+        return redirect('posts:post_detail', post_id=post_id)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        return redirect('posts:post_detail', post_id=post_id)
+    context = {
+        'post_id': post_id,
+        'form': form,
+        'is_edit': True
+    }
+    return render(request, 'posts/create_post.html', context)
