@@ -62,29 +62,32 @@ def post_detail(request, post_id):
 def post_create(request):
     template = 'posts/create_post.html'
     form = PostForm(request.POST or None)
-    if request.method == "POST":
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect('post:profile', post.author)
-        return render(request, template, {'form': form})
-    return render(request, 'posts/create_post.html', {'form': form})
+
+    if request.method == 'POST' and form.is_valid():
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
+        return redirect('post:profile', post.author)
+
+    return render(request, template, {'form': form})
 
 
 @login_required
 def post_edit(request, post_id):
+    template = 'posts/create_post.html'
     post = get_object_or_404(Post, pk=post_id)
-    form = PostForm(
-        request.POST or None, instance=post)
+    form = PostForm(request.POST or None, instance=post)
+
     if post.author != request.user:
         return redirect('posts:post_detail', post_id=post_id)
+
     if request.method == 'POST' and form.is_valid():
         form.save()
         return redirect('posts:post_detail', post_id=post_id)
+
     context = {
         'post_id': post_id,
         'form': form,
         'is_edit': True
     }
-    return render(request, 'posts/create_post.html', context)
+    return render(request, template, context)

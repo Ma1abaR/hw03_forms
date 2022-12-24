@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% block title %}
 {% if is_edit %}
   Редактировать пост
@@ -6,6 +7,7 @@
   Создать новый пост
   {% endif %}
 {% endblock title %}
+
 {% block content %}
 {% load user_filters %}
   <div class="container py-5">
@@ -46,8 +48,7 @@
                 aria-required="true"
               {% else %}
                 aria-required="false"
-              {% endif %}
-            >
+              {% endif %}>
               <label for="{{ field.id_for_label }}">
                 {{ field.label }}
                   {% if field.field.required %}
@@ -67,10 +68,10 @@
           <div class="col-md-6 offset-md-4">
             <button type="submit" class="btn btn-primary">
               {% if is_edit %}
-                    Сохранить
-                  {% else %}
-                    Добавить
-                  {% endif %}
+                Сохранить
+              {% else %}
+                Добавить
+              {% endif %}
             </button>
           </div>
         </form>
